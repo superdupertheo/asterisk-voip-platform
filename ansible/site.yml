@@ -1,0 +1,16 @@
+---
+- name: Configure Rocky Linux for Podman, k3s and Asterisk
+  hosts: voip
+  become: true
+
+  vars:
+    deployment_user: rocky
+    sip_port: "5060/udp"
+    rtp_port_range: "10000-10100/udp"
+
+  roles:
+    - packages
+    - firewall
+    - k3s
+    - asterisk_storage
+    - verification

@@ -1,0 +1,41 @@
+---
+- name: Check whether k3s is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+
+- name: Download k3s installation script
+  ansible.builtin.get_url:
+    url: https://get.k3s.io
+    dest: /tmp/install-k3s.sh
+    mode: "0755"
+  when: not k3s_binary.stat.exists
+
+- name: Install k3s
+  ansible.builtin.command:
+    cmd: /tmp/install-k3s.sh
+  environment:
+    INSTALL_K3S_EXEC: "server --write-kubeconfig-mode 0640"
+  when: not k3s_binary.stat.exists
+
+- name: Wait for k3s kubeconfig
+  ansible.builtin.wait_for:
+    path: /etc/rancher/k3s/k3s.yaml
+    timeout: 120
+
+- name: Create Kubernetes configuration directory
+  ansible.builtin.file:
+    path: "/home/{{ deployment_user }}/.kube"
+    state: directory
+    owner: "{{ deployment_user }}"
+    group: "{{ deployment_user }}"
+    mode: "0700"
+
+- name: Copy k3s kubeconfig for deployment user
+  ansible.builtin.copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "/home/{{ deployment_user }}/.kube/config"
+    remote_src: true
+    owner: "{{ deployment_user }}"
+    group: "{{ deployment_user }}"
+    mode: "0600"

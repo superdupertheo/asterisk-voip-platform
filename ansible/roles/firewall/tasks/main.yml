@@ -1,0 +1,20 @@
+---
+- name: Enable and start firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    enabled: true
+    state: started
+
+- name: Permit SIP traffic
+  ansible.posix.firewalld:
+    port: "{{ sip_port }}"
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Permit RTP traffic
+  ansible.posix.firewalld:
+    port: "{{ rtp_port_range }}"
+    permanent: true
+    immediate: true
+    state: enabled

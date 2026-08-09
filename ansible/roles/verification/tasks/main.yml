@@ -1,0 +1,20 @@
+---
+- name: Check Podman version
+  ansible.builtin.command:
+    cmd: podman --version
+  register: podman_version
+  changed_when: false
+
+- name: Display Podman version
+  ansible.builtin.debug:
+    var: podman_version.stdout
+
+- name: Check k3s node status
+  ansible.builtin.command:
+    cmd: k3s kubectl get nodes
+  register: k3s_nodes
+  changed_when: false
+
+- name: Display k3s node status
+  ansible.builtin.debug:
+    var: k3s_nodes.stdout_lines
