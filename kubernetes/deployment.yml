@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asterisk
+  namespace: voip
+  labels:
+    app: asterisk
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: asterisk
+  template:
+    metadata:
+      labels:
+        app: asterisk
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      imagePullSecrets:
+        - name: ghcr-credentials
+      containers:
+        - name: asterisk
+          image: ghcr.io/superdupertheo/asterisk-voip:1.0.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 100
+            runAsGroup: 101
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: sip
+              containerPort: 5060
+              protocol: UDP
+            - name: rtp-start
+              containerPort: 10000
+              protocol: UDP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            exec:
+              command:
+                - /usr/sbin/asterisk
+                - -rx
+                - core show uptime
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - /usr/sbin/asterisk
+                - -rx
+                - core show uptime
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: asterisk-pjsip
+              mountPath: /etc/asterisk/pjsip.conf
+              subPath: pjsip.conf
+              readOnly: true
+            - name: asterisk-config
+              mountPath: /etc/asterisk/extensions.conf
+              subPath: extensions.conf
+              readOnly: true
+            - name: asterisk-config
+              mountPath: /etc/asterisk/rtp.conf
+              subPath: rtp.conf
+              readOnly: true
+            - name: asterisk-data
+              mountPath: /var/spool/asterisk
+      volumes:
+        - name: asterisk-pjsip
+          secret:
+            secretName: asterisk-pjsip-secret
+        - name: asterisk-config
+          configMap:
+            name: asterisk-config
+        - name: asterisk-data
+          persistentVolumeClaim:
+            claimName: asterisk-data
