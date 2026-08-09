@@ -1,0 +1,74 @@
+# ==========================================
+# Terraform
+# ==========================================
+
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform.lock.hcl
+
+# Real variable values may contain sensitive data
+terraform.tfvars
+
+# Keep example variable files
+!terraform.tfvars.example
+
+
+# ==========================================
+# Ansible
+# ==========================================
+
+*.retry
+vault-password*
+*.vault
+
+
+# ==========================================
+# SSH / Keys / Certificates
+# ==========================================
+
+*.pem
+*.key
+*.ppk
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+
+# ==========================================
+# Kubernetes Secrets
+# ==========================================
+
+# Ignore real secret manifests
+secret.yml
+secret.yaml
+
+# Keep safe example manifests
+!secret.example.yml
+!secret.example.yaml
+
+
+# ==========================================
+# Environment / Credentials
+# ==========================================
+
+.env
+.env.*
+*.secret
+credentials
+credentials.*
+
+
+# ==========================================
+# Editor / OS Files
+# ==========================================
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

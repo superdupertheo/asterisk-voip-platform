@@ -1,0 +1,7 @@
+aws_region = "us-east-1"
+
+ami_id   = "ami-replace-with-rocky-linux-ami"
+key_name = "your-existing-key-pair"
+
+admin_cidr      = "replace_later"
+sip_client_cidr = "replace_later"
