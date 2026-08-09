@@ -1,0 +1,15 @@
+kubernetes/service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: asterisk
+  namespace: voip
+spec:
+  selector:
+    app: asterisk
+  ports:
+    - name: sip
+      port: 5060
+      targetPort: 5060
+      protocol: UDP
+  type: ClusterIP
